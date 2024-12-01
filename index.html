@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Happy Birthday!</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="script.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <meta
+      property="og:image"
+      content="https://birthday.sznm.dev/img/cake.svg"
+    />
+    <meta
+      property="twitter:image"
+      content="https://birthday.sznm.dev/img/cake.svg"
+    />
+  </head>
+  <body>
+    <div class="landing">
+      <h2>Why is it so dark?</h2>
+      <button class="light">Turn the lights on</button>
+    </div>
+
+    <div class="greeting">
+      <div class="cake-cont">
+        <div class="greeting-txt">
+          <img
+            src="img/birthday-txt.svg"
+            class="birthday-txt"
+            alt="Happy birthday.svg"
+          />
+        </div>
+
+        <div class="cake">
+          <img src="img/candle.svg" alt="" class="candle" />
+          <img src="img/cake.svg" alt="" />
+        </div>
+        <button class="candle-btn">Light it up!</button>
+      </div>
+    </div>
+    <audio src="hbd.mp3" loop id="birthdayAudio">aaa</audio>
+
+    <div class="gift-modal" id="giftModal">
+      <div class="modal-content">
+        <div class="gift-card">
+          <h2>To: Rayne & K'sle</h2>
+          <p>
+            Happy happy birthday, mga ate ko!! Thank you for being the bestest
+            friends to me. Youve been strong this year, thank you for all the
+            positive words and funny messages!! I just want you to know that
+            even the smallest amount of time i spend with you are the most
+            memorable memory i will cherish for the rest of my life!! im so so
+            so happy to be friends with u two and emy!! U know im always here
+            for you, love u!!
+          </p>
+          <p class="signature">-Chaaa</p>
+
+          <a href="memories.html">See our memories ✨</a>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const greeting = document.querySelector(".greeting");
+        if (greeting) {
+          greeting.style.display = "none"; // Hide initially
+        }
+      });
+
+      document.querySelector(".light").addEventListener("click", function () {
+        const landing = document.querySelector(".landing");
+        const greeting = document.querySelector(".greeting");
+        const audio = document.getElementById("birthdayAudio");
+
+        // Play audio
+        audio.play();
+
+        // Change background color directly on body
+        document.body.style.backgroundColor = "var(--bg-yellow)";
+        document.body.style.transition = "background-color 5s ease";
+
+        // Fade out landing
+        landing.style.opacity = "0";
+
+        // Remove landing after fade-out completes
+        setTimeout(() => {
+          landing.remove();
+        }, 1000);
+
+        // Show greeting with fade-in
+        greeting.style.display = "block";
+        setTimeout(() => {
+          greeting.style.opacity = "1";
+        }, 10);
+      });
+
+      document
+        .querySelector(".candle-btn")
+        .addEventListener("click", function () {
+          const candle = document.querySelector(".candle");
+          const birthdayText = document.querySelector(".birthday-txt");
+
+          // Show and animate candle
+          candle.style.display = "block";
+          candle.classList.add("lit");
+
+          // Show birthday text with animation
+          birthdayText.style.display = "block";
+          birthdayText.style.opacity = "1";
+          birthdayText.style.transform = "scale(1)";
+
+          // Add stars and shapes
+          createStars();
+
+          // Add rainbow background
+          document.body.style.animation = "rainbowBg 5s infinite";
+
+          // Add shockwave
+          createShockwave();
+
+          // Initial confetti explosions
+          const end = Date.now() + 3 * 1000;
+
+          confetti({
+            particleCount: 100,
+            spread: 70,
+            origin: { y: 0.6 },
+          });
+
+          // Continuous confetti bursts
+          (function frame() {
+            confetti({
+              particleCount: 20,
+              angle: 60,
+              spread: 55,
+              origin: { x: 0 },
+            });
+
+            confetti({
+              particleCount: 20,
+              angle: 120,
+              spread: 55,
+              origin: { x: 1 },
+            });
+
+            if (Date.now() < end) {
+              requestAnimationFrame(frame);
+            }
+          })();
+
+          // Stop birthday text blinking after confetti ends
+          setTimeout(() => {
+            birthdayText.style.animation = "none";
+            birthdayText.style.filter =
+              "brightness(1) drop-shadow(0 0 10px rgba(255, 215, 0, 0.5))";
+          }, 3000);
+
+          setTimeout(() => {
+            const giftModal = document.getElementById("giftModal");
+            giftModal.classList.add("modal-show");
+          }, 10000); // Changed from 8000 to 10000 milliseconds (10 seconds)
+        });
+
+      function createStars() {
+        const starsContainer = document.createElement("div");
+        starsContainer.className = "stars-container";
+
+        // Create different types of shapes
+        for (let i = 0; i < 15; i++) {
+          createShape(starsContainer, "star"); // Original stars
+        }
+
+        for (let i = 0; i < 10; i++) {
+          createShape(starsContainer, "diamond"); // Diamonds
+        }
+
+        for (let i = 0; i < 8; i++) {
+          createShape(starsContainer, "heart"); // Hearts
+        }
+
+        for (let i = 0; i < 12; i++) {
+          createShape(starsContainer, "sparkle-star"); // Different colored stars
+        }
+
+        document.body.appendChild(starsContainer);
+
+        // Periodically reposition all shapes
+        setInterval(() => {
+          // Fix: Select all shapes individually and combine them
+          const allShapes = [
+            ...starsContainer.getElementsByClassName("star"),
+            ...starsContainer.getElementsByClassName("diamond"),
+            ...starsContainer.getElementsByClassName("heart"),
+            ...starsContainer.getElementsByClassName("sparkle-star"),
+          ];
+
+          allShapes.forEach((shape) => {
+            if (Math.random() < 0.2) {
+              repositionShape(shape);
+            }
+          });
+        }, 2000);
+      }
+
+      function createShape(container, shapeType) {
+        const shape = document.createElement("div");
+        shape.className = shapeType;
+
+        // Set initial random properties
+        repositionShape(shape);
+
+        container.appendChild(shape);
+      }
+
+      function repositionShape(shape) {
+        // Random position across the whole screen
+        shape.style.left = `${Math.random() * 100}vw`;
+        shape.style.top = `${Math.random() * 100}vh`;
+
+        // Random size between 8px and 20px
+        const size = 8 + Math.random() * 12;
+        shape.style.width = `${size}px`;
+        shape.style.height = `${size}px`;
+
+        // Random animation delays
+        shape.style.animationDelay = `${Math.random() * 2}s`;
+      }
+
+      function createShockwave() {
+        const wave = document.createElement("div");
+        wave.className = "shockwave";
+        wave.style.top = "50%";
+        wave.style.left = "50%";
+        wave.style.transform = "translate(-50%, -50%)";
+        document.querySelector(".cake-cont").appendChild(wave);
+
+        setTimeout(() => wave.remove(), 1000);
+      }
+
+      document
+        .querySelector(".gift-modal")
+        .addEventListener("click", function (event) {
+          // Close only if clicking the modal background (not the content)
+          if (event.target === this) {
+            this.classList.remove("modal-show");
+          }
+        });
+    </script>
+  </body>
+</html>
